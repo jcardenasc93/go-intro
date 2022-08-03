@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"sort"
@@ -30,7 +31,59 @@ type FootballPlayerInterface interface {
 	MarketValue() float32
 }
 
+//NOTE: Channels are usefull to pass information between different parts of the program
+//  without access vars values. This is extremely useful when sharing info between packages
+func CalcRandValue(intChan chan int) {
+	const n = 10
+	randValue := helpers.GenerateRandInt(n)
+	log.Println(randValue)
+	//NOTE: chan <- is the way to pass value to a channel
+	intChan <- randValue
+
+}
+
 var option string
+
+type Animal struct {
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	IsAdopted bool   `json:"is_adopted"`
+}
+
+func checkErrorNilValue(err *error, msg string) {
+	if *err != nil {
+		log.Panic(msg, "\n", *err)
+	}
+
+}
+
+func jsonHandler() {
+
+	aJson := `
+  [
+      {
+        "name": "Tokyo",
+        "type": "cat",
+        "is_adopted": true
+      },
+      {
+        "name": "Bruno",
+        "type": "dog",
+        "is_adopted": false
+      }
+  ]
+  `
+	var unmarshalledJson []Animal
+	//NOTE: Unmarshal is the process to convert a plain json bytes to struct
+	err := json.Unmarshal([]byte(aJson), &unmarshalledJson)
+	checkErrorNilValue(&err, "Cannot unmarhall json bytes. Maybe malformed json")
+	log.Printf("Unmarhaled json: %v\n", unmarshalledJson)
+
+	//NOTE: Marshal is the way to go in order to convert struct to plain json bytes
+	animals, err := json.MarshalIndent(unmarshalledJson, "", "    ")
+	checkErrorNilValue(&err, "Cannot marhall given struct")
+	log.Println("Marshalled struct:\n", string(animals))
+}
 
 func main() {
 	log.Println("Hello world!")
@@ -65,6 +118,10 @@ func main() {
 		runInterfacesExample()
 	case "packages":
 		runPackagesExample()
+	case "channels":
+		runChannelsExample()
+	case "jsonHandler":
+		jsonHandler()
 	default:
 		fmt.Println("Selected option is not valid")
 	}
@@ -180,6 +237,19 @@ func runPackagesExample() {
 	log.Println("The following Car type variable comes from helper package")
 	log.Println(testCar)
 }
+
+func runChannelsExample() {
+	intChan := make(chan int)
+	//NOTE: Run the func in a gorutine
+	go CalcRandValue(intChan)
+	//NOTE: <- channel is the way to read channel value
+	channelValue := <-intChan
+	log.Println("Current channel value is", channelValue)
+
+	//NOTE: defer helps to run this always before living the func. It doesn't matter where is putted
+	defer close(intChan)
+
+}
 func runSelector() string {
 	selector := make(map[string]string)
 	selector["1"] = "struct"
@@ -188,12 +258,16 @@ func runSelector() string {
 	selector["4"] = "for"
 	selector["5"] = "interface"
 	selector["6"] = "packages"
+	selector["7"] = "channels"
+	selector["8"] = "jsonHandler"
 	fmt.Println("1) Run struct example")
 	fmt.Println("2) Run map example")
 	fmt.Println("3) Run slice example")
 	fmt.Println("4) Run for loops example")
 	fmt.Println("5) Run interfaces example")
-	fmt.Println("6) Run interfaces packages")
+	fmt.Println("6) Run packages example")
+	fmt.Println("7) Run channels example")
+	fmt.Println("8) Run json handler example")
 	fmt.Scanf("%s", &option)
 
 	return selector[option]
