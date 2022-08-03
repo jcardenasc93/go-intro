@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/jcardenasc93/go-intro/helpers"
 )
 
 type User struct {
@@ -61,6 +63,8 @@ func main() {
 		runForLoopsExample()
 	case "interface":
 		runInterfacesExample()
+	case "packages":
+		runPackagesExample()
 	default:
 		fmt.Println("Selected option is not valid")
 	}
@@ -167,6 +171,15 @@ func DisplayFootballPlayerInfo(f FootballPlayerInterface) {
 	log.Println("Market value is", f.MarketValue())
 }
 
+func runPackagesExample() {
+	testCar := helpers.Car{
+		Brand: "BMW",
+		Model: 2014,
+		Color: "#000",
+	}
+	log.Println("The following Car type variable comes from helper package")
+	log.Println(testCar)
+}
 func runSelector() string {
 	selector := make(map[string]string)
 	selector["1"] = "struct"
@@ -174,11 +187,13 @@ func runSelector() string {
 	selector["3"] = "slice"
 	selector["4"] = "for"
 	selector["5"] = "interface"
+	selector["6"] = "packages"
 	fmt.Println("1) Run struct example")
 	fmt.Println("2) Run map example")
 	fmt.Println("3) Run slice example")
 	fmt.Println("4) Run for loops example")
 	fmt.Println("5) Run interfaces example")
+	fmt.Println("6) Run interfaces packages")
 	fmt.Scanf("%s", &option)
 
 	return selector[option]
