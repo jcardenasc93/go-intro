@@ -13,6 +13,8 @@ var tests = []struct {
 	{"validInput", 100.0, 0.0, 0.0, true},
 }
 
+//NOTE: Run go test -cover to check test coverage
+
 func TestDivision(t *testing.T) {
 	for _, tt := range tests {
 		got, err := DivideFloats(tt.dividend, tt.divisor)
